@@ -1,0 +1,35 @@
+
+
+_id - image { national identity card, school id card } 
+result - image { image of previous result showing matriculation number }
+selfie - image { image of users face } 
+
+
+tutor_profile
+{
+	bio, 
+	ratings,
+	reviews, 
+	.
+	.
+	.
+	verification > { _id: url, result: url, selfie: url, verified: Bool, upload_complete: Bool, 
+upload_complete_date: Bool,	_id_uploaded: Bool, 
+result_uploaded: Bool, selfie_uploaded: Bool	} 
+}
+
+
+	verification 
+		_id: yes { upload } done 
+		result:  { upload } done 
+		selfie: no  { upload } done 
+		
+		patch tutor verification { current_upload{name, content}, _id, result, selfie } => 
+		once image is successfully uploaded, update its upload status,  check if others are complete 
+		if( id_uploaded, result_uploaded, selfie_uploaded )
+		{
+			upload_complete  = true 
+			upload_complete_date = Date.now() 
+		}
+		
+		when ever an image changes, it will be reverified 
