@@ -27,7 +27,7 @@ const BookingOverviewSchema = new Schema
             required: true,
             default: 'inprogress'
         },
-        course_code:
+        courseCode:
         {
             type: String,
             required: true 

@@ -62,6 +62,42 @@ const ReviewSchema = new Schema
 
 
 
+const TimePackagesSchema = new Schema 
+(
+    {
+        timeInMinutes: 
+        {
+            type: Number
+        },
+        price:
+        {
+            type: Number 
+        },
+        commissionAmount:
+        {
+            type: Number
+        }
+        
+    }
+)
+
+
+
+const DaysAvailableSchema  = new Schema 
+(
+    {
+        day:
+        {
+            type: String 
+        },
+        timeOfDay:
+        {
+            type: String 
+        }
+    }
+)
+
+
 
 const CourseAdSchema = new Schema 
 (
@@ -91,15 +127,29 @@ const CourseAdSchema = new Schema
         tutor_rating:
         {
             type: Number, 
-            required: true 
+            required: true
         },
-        price:
+        fixedPriceCommissionAmount:
         {
             type: Number
         },
-        price_negotiable:
+        fixedPrice: 
         {
-            type: Boolean
+            type: Boolean, 
+            required: true 
+        },
+        fixedPriceValue:
+        {
+            type: Number
+        },
+        timePackages:
+        {
+            type: [TimePackagesSchema]
+        },
+        daysAvailable:
+        {
+            type: [DaysAvailableSchema],
+            default: [{"day":"anyday","time":"anytime"}] 
         },
         description:
         {

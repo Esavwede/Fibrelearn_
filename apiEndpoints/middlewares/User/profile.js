@@ -78,9 +78,6 @@ const personnalProfile_patch = async function(req, res, next)
 {
         try
         {
-             /* 
-            
-            */
 
             const { profile_picture_url, lastname, firstname, password, phone_number, age, sex, email, level, department, university   } = req.body 
             
@@ -137,8 +134,8 @@ const tutorProfile_get = async function(req, res, next)
                  course_ads_count: 1, isVerified: 1, isAvailable: 1, student_preferences: 1  })
 
             
-                    const userData =  {  bio: false, ratings: false, reviews_count: false,
-                    course_ads_count: false, isVerified: false, isAvailable: false, student_preferences: false }
+                    const userData =  {  bio: null, ratings: 0, reviews_count: 0,
+                    course_ads_count: 0, isVerified: false, isAvailable: true, student_preferences: null }
                     
 
 
@@ -147,7 +144,10 @@ const tutorProfile_get = async function(req, res, next)
 
                     if( tutorProfile === null )
                     {
-                        const doc = { _id: req.user._id } 
+                        const firstname = req.user.firstname 
+                        const user_id = req.user._id 
+
+                        const doc = { _id: user_id, firstname: firstname } 
                         const newTutorProfile = new TutorProfile(doc)
                         const creationResult = await newTutorProfile.save()
 

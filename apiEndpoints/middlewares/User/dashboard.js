@@ -14,7 +14,8 @@ const dashboard_get = async function(req, res, next)
         const data = { notification_count: user.notifications_count,
                         bookings_count: user.bookings_count, 
                     profile_picture_url: user.profile_picture_url,
-                    emailVerified: user.emailVerified
+                    emailVerified: user.emailVerified,
+                    firstname: req.user.firstname
                     }
 
         if( user.userIsNew )

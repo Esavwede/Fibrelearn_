@@ -25,7 +25,7 @@ const getCourseCode_post = async function(req, res, next)
         ]
 
         const searchResult = await UnibenCourses.aggregate(pipeline)
-
+        
         const coursesArray = [] 
 
         for( result of searchResult )

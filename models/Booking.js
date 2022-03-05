@@ -16,6 +16,7 @@ const DaySchema = new Schema
 )
 
 
+
 const BookingSchema = new Schema 
 (
     {
@@ -25,10 +26,15 @@ const BookingSchema = new Schema
         student_id:{ type: mongoose.Types.ObjectId, required: true},
         tutor_id:{ type: mongoose.Types.ObjectId, required: true },
         delete_count:{ type: Number, required: true, default: 0  },
-        initial_price:{ type: Number, required: true },
+        fixedPrice: { type: Boolean },
+        totalLessonTime:{ type: Number }, 
+        timePackageSelected:{ type: Number },
+        timePackageCount:{ type: Number }, 
+        commissionAmount:{type: Number },
+        studentPays:{ type: Number },
+        tutorReceives:{ type: Number }, 
         student_negotiation_price:{ type: Number },
-        final_price:{ type: Number},
-        tutor_response_time:{ type: Date }, 
+        tutor_response_time:{ type: Date },
         negotiation_finish_time: {type: Date },
         negotiation_duration:{ type: Date},
         studentNote:{ type: String },

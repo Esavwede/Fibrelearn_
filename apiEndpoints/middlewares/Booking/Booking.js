@@ -1,6 +1,8 @@
 const  { createServerError }= require('../../../UtilityFunctions/ServerError/server_error')
 const  Booking = require('../../../models/Booking')
 const User = require('../../../models/User') 
+const CourseAds = require('../../../models/CourseAds')
+const TutorProfiles = require('../../../models/TutorProfile')
 
 
 const createBooking_post = async function(req, res, next)
@@ -16,21 +18,120 @@ const createBooking_post = async function(req, res, next)
             const tutor_id = req.body.tutor_id 
             const tutor_firstname = req.body.tutor_firstname
             const tutor_profile_picture_url = req.body.tutor_profile_picture_url 
+            const studentNote = req.body.studentNote    
+            const studentDays = req.body.studentDays 
+            const studentLocation = req.body.studentLocation 
+            const fixedPrice = req.body.fixedPrice 
+            const timePackage = req.body.timePackage
+            const timePackageCount = req.body.timePackageCount 
+            var sent_at
+            var booking_id 
+
+       
+
+            if( fixedPrice )
+            {
+                // verify fixed price value 
+                const priceResult = await CourseAds.findOne({ tutor_id, courseCode },{ _id: 0, fixedPriceValue: 1, fixedPriceCommissionAmount: 1})
+                
+
+                console.log(' here ogaga ' + priceResult ) 
+               const commissionAmount = priceResult.fixedPriceCommissionAmount 
+               const studentPays = priceResult.fixedPriceValue 
+               const tutorReceives = studentPays - commissionAmount 
 
 
-            delete req.body.tutor_firstname 
-            delete req.body.tutor_profile_picture_url 
+                                // creating booking 
+                                delete req.body.tutor_firstname 
+                                delete req.body.tutor_profile_picture_url 
+                              
+                                req.body.student_id = student_id 
+                                req.body.studentPays = studentPays 
+                                req.body.commissionAmount = commissionAmount 
+                                req.body.tutorReceives = tutorReceives 
+                    
+                                
+                                const doc = req.body 
+                                const _newBooking = new Booking(doc)
+                                const newBooking = await _newBooking.save() 
+                               
+                                console.log(newBooking) 
+               
+                           sent_at = newBooking.booked_on
+                           booking_id = newBooking._id 
+                               // created booking 
+
+
+                
+            }
+            else 
+            {
+                // price Plans 
+                 // verify fixed price value 
+                 const priceResult = await CourseAds.findOne({ tutor_id, courseCode },{ _id: 0, timePackages: 1 })
+
+                    console.log(' 1 here ogaga ' + priceResult) 
+                 
+                    let lessonPlans = priceResult.timePackages 
+                    let count = timePackageCount 
+                    let lessonPlansCount = lessonPlans.length 
+                    let i = 0
+                    var correctPlan 
+
+                    for( i = 0; i < lessonPlansCount; i++ )
+                    {
+                            if(  lessonPlans[i].timeInMinutes === timePackage )
+                            {
+                                // time, price, commissionAmount 
+                                correctPlan = { totalLessonTimeInMInutesPaidFor: ( timePackage * timePackageCount ), price: lessonPlans[i].price, commissionAmount: lessonPlans[i].commissionAmount }
+                                break
+                            }
+                    }
+
+                    if( correctPlan === null )
+                    {
+                        return res.status(400).json({"success": false, "msg":"wrong lesson plan "})
+                    }
+
+                    console.log('here ogaga  ' + correctPlan.totalLessonTimeInMInutesPaidFor ) 
+
+                    const studentPays = ( correctPlan.price ) * ( timePackageCount )
+                    const commissionAmount = ( correctPlan.commissionAmount ) * ( timePackageCount )
+                    const tutorReceives = studentPays - commissionAmount
+                    const totalLessonTime = correctPlan.totalLessonTimeInMInutesPaidFor
+
+
+                                  // creating booking 
+                                  delete req.body.tutor_firstname 
+                                  delete req.body.tutor_profile_picture_url 
+                                
+                                  req.body.student_id = student_id
+                                  req.body.studentPays = studentPays 
+                                  req.body.commissionAmount = commissionAmount 
+                                  req.body.tutorReceives = tutorReceives 
+                                  req.body.totalLessonTime = totalLessonTime
+
+                                  
+                                  
+                                  const doc = req.body
+                                  const _newBooking = new Booking(doc)
+                                  const newBooking = await _newBooking.save() 
+                                 
+
+                                  console.log('here ogaga the new booking  ' + newBooking ) 
+                 
+                              sent_at = newBooking.booked_on
+                              booking_id = newBooking._id 
+                                 // created booking 
+
+
+
+            }
           
-            req.body.student_id = student_id 
-            const doc = req.body 
-            const _newBooking = new Booking(doc)
-            const newBooking = await _newBooking.save() 
+            
+        
 
-            const sent_at = newBooking.booked_on
-            const booking_id = newBooking._id 
-
-
-            const updateBody_student = { $inc:{"bookings_count": 1},$push:{ bookings:[{ booking_id, courseCode, tutor_id, tutor_profile_picture_url,
+            const updateBody_student = {$push:{ bookings:[{ studentNote, studentDays, studentLocation, booking_id, courseCode, tutor_id, tutor_profile_picture_url,
                  seen_by_receiver: false, sent_by_me: true, tutor_firstname, sent_at, sent_by_me: true, seen_by_me: true }]}}
 
             const studentUpdate = await User.findByIdAndUpdate({ _id: student_id },updateBody_student)
@@ -39,14 +140,16 @@ const createBooking_post = async function(req, res, next)
             const updateBody_tutor = { $inc:{"bookings_count": 1}, $push: { bookings:[ {booking_id,courseCode, student_id, student_profile_picture_url, 
                 seen_by_me: false, sent_by_me: false, student_firstname, sent_at,  sent_by_me: false } ] }}
             const tutorUpdate = await  User.findByIdAndUpdate({ _id: tutor_id },updateBody_tutor)
-            console.log(tutorUpdate)
+            console.log(tutorUpdate) //
 
                 
             return res.status(201).json({"success": true, "msg":" new booking created successfully "})
     } catch (err) {
+        console.log(err) 
         createServerError('error occured while creating booking',err,res)   
     }
 }
+
 
 
 
@@ -154,9 +257,12 @@ const booking_patch = async function(req, res, next)
 {
     try
     {
-        const location = req.body.location
-        const days = req.body.days 
+        
         const booking_id = req.body.booking_id 
+        const sudentLocation = req.body.studentLocation
+        const studentDays = req.body.studentDays 
+        const studentNote = req.body.studentNote 
+        
 
 
      
@@ -179,7 +285,6 @@ const booking_patch = async function(req, res, next)
         createServerError('error occured while updating booking ',err,res)
     }
 }
-
 
 
 
@@ -208,12 +313,12 @@ const renegotiateBooking_patch = async function(req, res, next)
             const updateBody2 = { $inc:{ "bookings_count": 1}, $set: {"bookings.$[elem].seen_by_me": false }}
             const arrayFilter = { arrayFilters: [ { "elem.booking_id": booking_id }]}
             await User.updateOne({ _id: receiver_id },updateBody2, arrayFilter)
-           
+            
 
 
              console.log(updatedBooking)  
      
-             return res.status(200).json({"success": true, updatedBooking})
+             return res.status(200).json({"success": true, updatedBooking, "msg":"student renegotiated booking"})
         }
         else 
         {
@@ -235,7 +340,7 @@ const renegotiateBooking_patch = async function(req, res, next)
 
             console.log(updatedBooking)  
     
-            return res.status(200).json({"success": true, updatedBooking})
+            return res.status(200).json({"success": true, updatedBooking,'msg':"tutor renegotiated booking"})
         }
 
     }
@@ -253,17 +358,21 @@ const booking_delete = async function(req, res, next)
 {
     try
     {
-      
-         const updateBody = { $pull:{ "bookings": { booking_id } }} 
-         const deleteForUser  = await User.findByIdAndUpdate({ _id: "61fb5c11ff5f34eb2c35c698" },updateBody)
         
-         const booking_updateBody = { $inc: { "delete_count": 1 }} 
+         const booking_id = req.params.booking_id 
+         const updateBody = { $pull:{ "bookings": { booking_id } }}
+         const user_id = req.user._id 
+
+         const deleteForUser  = await User.findByIdAndUpdate({ _id: user_id },updateBody)
+        
+         const booking_updateBody = { $inc: { "delete_count": 1 }}
          const booking_update_options = { new: true }
          const bookingUpdate = await Booking.findByIdAndUpdate({ _id: booking_id },booking_updateBody, booking_update_options)
 
+         console.log(bookingUpdate) 
          if( bookingUpdate.delete_count > 1 )
         {
-             await Booking.findByIdAndDelete({ _id: "61ff27e0a08177791a2d763d" })
+             await Booking.findByIdAndDelete({ _id: bookingUpdate._id })
         }
 
         return res.status(200).json({ "success": true, "msg":"successfully deleted booking "}) 

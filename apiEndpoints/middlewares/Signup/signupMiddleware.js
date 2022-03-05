@@ -68,7 +68,7 @@ const signup_post = async function(req, res, next)
                  // error occured while saving user ? 
                  if( !savedUser ) return res.status(500).json({"success":"false","msg":"error occured while saving new user "})
 
-                 await sendEmail(mailBody).then((res)=> console.log(res)).catch((err)=> console.log('error occured while sending mail '))
+                 await sendEmail(mailBody).then((res)=> console.log(res)).catch((err)=> console.log('error occured while sending mail :' + err))
                  
                  // error occured while sending mail ? 
 

@@ -134,7 +134,7 @@ const TutorProfileSchema = new Schema
             type: String, 
             default: 'No profile Picture'
         },
-        tutor_firstname:
+        firstname:
         {
             type: String,
             required: true 
@@ -143,6 +143,12 @@ const TutorProfileSchema = new Schema
         {
             type: String
         },
+        commissionRate:
+        {
+            type: Number, 
+            required: true, 
+            default: 30
+        }, 
         tutor_rating:
         {
             type: Number,
