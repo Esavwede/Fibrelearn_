@@ -17,7 +17,7 @@ async function start_db()
     {
         try
         {
-            await mongoose.connect('mongodb://localhost:27017/Fibrelearn',{ useNewUrlParser: true, useUnifiedTopology: true, serverSelectionTimeoutMS: 59000})    
+            await mongoose.connect(DB_URI,{ useNewUrlParser: true, useUnifiedTopology: true, serverSelectionTimeoutMS: 59000})    
         }catch(err)
         {
             return console.log(err)
