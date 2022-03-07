@@ -24,6 +24,7 @@ const { sendEmail} = require('../../../UtilityFunctions/Send_Emails/sendEmail')
 
 require('dotenv').config() 
 
+const domain = process.env.Domain 
 
 /* POST signup */
 const signup_post = async function(req, res, next)
@@ -63,7 +64,7 @@ const signup_post = async function(req, res, next)
                                 email,// to 
                                 'verify email',// subject 
                                 ' visit the link to verify your fibrelearn account', // text 
-                                ` click the link to verify your fibrelearn account - <a href="http://localhost:3000/api/verifyEmail/${verificationCode}">click</a>`)// html 
+                                ` click the link to verify your fibrelearn account - <a href="${domain}/api/verifyEmail/${verificationCode}">click</a>`)// html 
 
                  // error occured while saving user ? 
                  if( !savedUser ) return res.status(500).json({"success":"false","msg":"error occured while saving new user "})
