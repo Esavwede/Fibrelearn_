@@ -20,7 +20,8 @@ async function start_db()
             await mongoose.connect(DB_URI,{ useNewUrlParser: true, useUnifiedTopology: true, serverSelectionTimeoutMS: 59000})    
         }catch(err)
         {
-            return console.log(err)
+            console.log( DB_URI )
+            return console.log('could not connect to the database ogaga ' + err)
         }
     }
 
