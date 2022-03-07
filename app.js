@@ -100,4 +100,11 @@ process.on('SIGINT',()=>{
 })
 
 
+
+require('dotenv').config() 
+
+
+console.log(' domain ' +  process.env.Domain ) 
+
+
 module.exports = app;
