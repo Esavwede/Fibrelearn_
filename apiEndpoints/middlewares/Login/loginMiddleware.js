@@ -68,7 +68,7 @@ const login_post = async function(req, res, next)
     const accessToken = await jwt.sign(_user, process.env.ACCESS_TOKEN_SECRET,{ expiresIn: "3d"})
     const refreshToken = await  jwt.sign(_user, process.env.REFRESH_TOKEN_SECRET)
     
-    const user_data = { accessToken: "Bearer "+ accessToken , refreshToken, userData: { user_id: req.user._id ,
+    const user_data = { accessToken: "Bearer "+ accessToken , refreshToken, personal_data: { user_id: req.user._id ,
                        isAdmin: req.user.isAdmin, profilePicture: req.user.profilePicture, firstname: req.user.firstname}}
     
     return res.status(200).json({"success":true, user_data})
